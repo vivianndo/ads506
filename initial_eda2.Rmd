@@ -1,0 +1,125 @@
+```{r}
+# library import
+library(readr)
+library(fpp2)
+library(zoo)
+library(tidyverse)
+library(ggplot2)
+library(gridExtra)
+library(dplyr)
+library(forecast)
+# read in data
+df <- read_csv('PLOO_water_temperature_2022_datasd.csv', show_col_types = FALSE)
+```
+```{r}
+## splice data for each depth ##
+df_1m <- subset(df, depth_m==1)
+df_9m <- subset(df, depth_m==9)
+df_20m <- subset(df, depth_m==20)
+df_30m <- subset(df, depth_m==30)
+df_45m <- subset(df, depth_m==45)
+df_60m <- subset(df, depth_m==60)
+df_74m <- subset(df, depth_m==74)
+df_87m <- subset(df, depth_m==87)
+
+# Convert the start date string into a POSIXct object
+df_1m$datetime_pst <- as.POSIXct(df_1m$datetime_pst, format='%Y-%m-%d %H:%M:%S')
+
+# Create time series object
+df_1m_ts <- ts(df_1m$value)
+df_9m_ts <- ts(df_9m$value)
+df_20m_ts <- ts(df_20m$value)
+df_30m_ts <- ts(df_30m$value)
+df_45m_ts <- ts(df_45m$value)
+df_60m_ts <- ts(df_60m$value)
+df_74m_ts <- ts(df_74m$value)
+df_87m_ts <- ts(df_87m$value)
+
+# plot all depths
+autoplot(df_1m_ts, main='Real-time Oceanographic Mooring System: Point Loma Ocean 2022', series='1m depth',
+ylab='Water Temperature (Degrees Celsius)') + 
+  autolayer(df_9m_ts, series='9m depth') +
+  autolayer(df_20m_ts, series='20m depth') +
+  autolayer(df_30m_ts, series='30m depth') +
+  autolayer(df_45m_ts, series='45m depth') +
+  autolayer(df_60m_ts, series='60m depth') +
+  autolayer(df_74m_ts, series='74m depth') +
+  autolayer(df_87m_ts, series='87m depth')
+
+# statistics
+summary(df_1m$value)
+summary(df_9m$value)
+summary(df_20m$value)
+summary(df_30m$value)
+summary(df_45m$value)
+summary(df_60m$value)
+summary(df_74m$value)
+summary(df_87m$value)
+```
+
+Consider measurements at 20m, 45m, 60m, or 87m for analysis since they have the fewest nulls. 
+```{r}
+# see distribution of water temperatures
+par(mfrow=c(2,4))
+hist(df_1m$value, main='1m', xlab= 'Water Temperature (Degrees Celsius)')
+hist(df_9m$value, main='9m', xlab= 'Water Temperature (Degrees Celsius)')
+hist(df_20m$value, main='20m', xlab= 'Water Temperature (Degrees Celsius)')
+hist(df_30m$value, main='30m', xlab= 'Water Temperature (Degrees Celsius)')
+hist(df_45m$value, main='45m', xlab= 'Water Temperature (Degrees Celsius)')
+hist(df_60m$value, main='60m', xlab= 'Water Temperature (Degrees Celsius)')
+hist(df_74m$value, main='74m', xlab= 'Water Temperature (Degrees Celsius)')
+hist(df_87m$value, main='87m', xlab= 'Water Temperature (Degrees Celsius)')
+```
+
+
+**Null imputation** 
+Replace with mean value
+
+
+Differencing
+```{r}
+df_9m_diff <- diff(df_9m_ts, lag=6)
+
+# Plotting the results
+autoplot(df_9m_diff) +
+  labs(title = "Differenced Time Series (depth_m = 9)", y = "Difference") +
+  theme_classic()
+```
+```{r}
+# Fit ARIMA model with differencing
+df_9m_diff_model <- Arima(df_9m_ts, order = c(1, 1, 1), seasonal = list(order = c(1, 1, 1)))
+df_9m_ARIMA <- residuals(df_9m_diff_model)
+plot(df_9m_ARIMA , main = "Differenced Time Series", ylab = "Differenced Values")
+```
+
+
+```{r}
+# Fit Logistic Regression model
+df_9m_train <- window(df_9m_ts, end = length(df_9m_ts) - 24)
+df_9m_test <- window(df_9m_ts, start = length(df_9m_ts) - 23)
+
+# Fit ETS model to the differenced training set
+df_9m_model <- ets(df_9m_train)
+
+# Generate forecasts for the differenced test set
+df_9m_pred <- forecast(df_9m_model, h = 24)
+
+summary(df_9m_model)
+```
+```{r}
+plot(df_9m_ts, col = "blue", main = "Time Series Forecasting with Logistic Regression Model")
+lines(df_9m_train, col = "red", lty = 2, lwd = 2)
+lines(df_9m_pred$mean, col = "green", lty = 2, lwd = 2)
+
+# Add legend
+legend("topleft", legend = c("Original Time Series", "Training Set", "Forecast"), col = c("blue", "red", "green"), lty = c(1, 2, 2))
+
+```
+
+
+
+
+
+
+
+
