@@ -1,4 +1,10 @@
-```{r}
+
+### Library and data import
+```{r setup}
+#| echo: false
+#| message: false
+#| warning: false
+
 # library import
 library(readr)
 library(fpp2)
@@ -8,9 +14,20 @@ library(ggplot2)
 library(gridExtra)
 library(dplyr)
 library(forecast)
+
+set.seed(506)
+```
+
+```{r}
 # read in data
 df <- read_csv('PLOO_water_temperature_2022_datasd.csv', show_col_types = FALSE)
+
+# convert the start date string into a POSIXct object
+df$datetime_pst <- as.POSIXct(df$datetime_pst, format='%Y-%m-%d %H:%M:%S')
 ```
+
+### Data splicing
+All temperature readings will be divided into different dataframes according to depth
 ```{r}
 ## splice data for each depth ##
 df_1m <- subset(df, depth_m==1)
@@ -22,9 +39,226 @@ df_60m <- subset(df, depth_m==60)
 df_74m <- subset(df, depth_m==74)
 df_87m <- subset(df, depth_m==87)
 
-# Convert the start date string into a POSIXct object
-df_1m$datetime_pst <- as.POSIXct(df_1m$datetime_pst, format='%Y-%m-%d %H:%M:%S')
+# statistics
+summary(df_1m$value)
+summary(df_9m$value)
+summary(df_20m$value)
+summary(df_30m$value)
+summary(df_45m$value)
+summary(df_60m$value)
+summary(df_74m$value)
+summary(df_87m$value)
+```
 
+Consider measurements at 9m, 20m, 45m, 60m, or 87m for analysis since they have the fewest nulls. 
+
+### Null imputation
+Replace nulls with average value of previous and next temperature readings. If both previous and next values are NA, loop through until the next non-NA value is found. 
+```{r}
+## 1 meter ##
+# create function to use next available non-NA values for previous and next rows
+impute_null_with_average <- function(x) {
+  if (is.na(x)) {
+    previous_index <- which(!is.na(df_1m$value))[1]
+    next_index <- which(!is.na(df_1m$value))[2]
+    
+    if (!is.na(previous_index) && !is.na(next_index)) {
+      previous_value <- df_1m$value[previous_index]
+      next_value <- df_1m$value[next_index]
+      return((previous_value + next_value) / 2)
+    }
+  }
+  
+  return(x)
+}
+
+# apply the function to impute null values
+df_1m <- df_1m %>%
+  rowwise() %>%
+  mutate(value = impute_null_with_average(value))
+
+# show null counts
+sum(is.na(df_1m))
+
+## 9 meter ##
+# create function to use next available non-NA values for previous and next rows
+impute_null_with_average <- function(x) {
+  if (is.na(x)) {
+    previous_index <- which(!is.na(df_9m$value))[1]
+    next_index <- which(!is.na(df_9m$value))[2]
+    
+    if (!is.na(previous_index) && !is.na(next_index)) {
+      previous_value <- df_9m$value[previous_index]
+      next_value <- df_9m$value[next_index]
+      return((previous_value + next_value) / 2)
+    }
+  }
+  
+  return(x)
+}
+
+# apply the function to impute null values
+df_9m <- df_9m %>%
+  rowwise() %>%
+  mutate(value = impute_null_with_average(value))
+
+# show null counts
+sum(is.na(df_9m))
+
+
+## 20m ##
+# create function to use next available non-NA values for previous and next rows
+impute_null_with_average <- function(x) {
+  if (is.na(x)) {
+    previous_index <- which(!is.na(df_20m$value))[1]
+    next_index <- which(!is.na(df_20m$value))[2]
+    
+    if (!is.na(previous_index) && !is.na(next_index)) {
+      previous_value <- df_20m$value[previous_index]
+      next_value <- df_20m$value[next_index]
+      return((previous_value + next_value) / 2)
+    }
+  }
+  
+  return(x)
+}
+
+# apply the function to impute null values
+df_20m <- df_20m %>%
+  rowwise() %>%
+  mutate(value = impute_null_with_average(value))
+
+# show null counts
+sum(is.na(df_20m))
+
+## 30m ##
+# create function to use next available non-NA values for previous and next rows
+impute_null_with_average <- function(x) {
+  if (is.na(x)) {
+    previous_index <- which(!is.na(df_30m$value))[1]
+    next_index <- which(!is.na(df_30m$value))[2]
+    
+    if (!is.na(previous_index) && !is.na(next_index)) {
+      previous_value <- df_30m$value[previous_index]
+      next_value <- df_30m$value[next_index]
+      return((previous_value + next_value) / 2)
+    }
+  }
+  
+  return(x)
+}
+
+# apply the function to impute null values
+df_30m <- df_30m %>%
+  rowwise() %>%
+  mutate(value = impute_null_with_average(value))
+
+# show null counts
+sum(is.na(df_30m))
+
+## 45m ##
+# create function to use next available non-NA values for previous and next rows
+impute_null_with_average <- function(x) {
+  if (is.na(x)) {
+    previous_index <- which(!is.na(df_45m$value))[1]
+    next_index <- which(!is.na(df_45m$value))[2]
+    
+    if (!is.na(previous_index) && !is.na(next_index)) {
+      previous_value <- df_45m$value[previous_index]
+      next_value <- df_45m$value[next_index]
+      return((previous_value + next_value) / 2)
+    }
+  }
+  
+  return(x)
+}
+
+# apply the function to impute null values
+df_45m <- df_45m %>%
+  rowwise() %>%
+  mutate(value = impute_null_with_average(value))
+
+# show null counts
+sum(is.na(df_45m))
+
+## 60m ##
+# create function to use next available non-NA values for previous and next rows
+impute_null_with_average <- function(x) {
+  if (is.na(x)) {
+    previous_index <- which(!is.na(df_60m$value))[1]
+    next_index <- which(!is.na(df_60m$value))[2]
+    
+    if (!is.na(previous_index) && !is.na(next_index)) {
+      previous_value <- df_60m$value[previous_index]
+      next_value <- df_60m$value[next_index]
+      return((previous_value + next_value) / 2)
+    }
+  }
+  
+  return(x)
+}
+
+# apply the function to impute null values
+df_60m <- df_60m %>%
+  rowwise() %>%
+  mutate(value = impute_null_with_average(value))
+
+# show null counts
+sum(is.na(df_60m))
+
+## 74m ##
+# create function to use next available non-NA values for previous and next rows
+impute_null_with_average <- function(x) {
+  if (is.na(x)) {
+    previous_index <- which(!is.na(df_74m$value))[1]
+    next_index <- which(!is.na(df_74m$value))[2]
+    
+    if (!is.na(previous_index) && !is.na(next_index)) {
+      previous_value <- df_74m$value[previous_index]
+      next_value <- df_74m$value[next_index]
+      return((previous_value + next_value) / 2)
+    }
+  }
+  
+  return(x)
+}
+
+# apply the function to impute null values
+df_74m <- df_74m %>%
+  rowwise() %>%
+  mutate(value = impute_null_with_average(value))
+
+# show null counts
+sum(is.na(df_74m))
+
+## 87m ##
+# create function to use next available non-NA values for previous and next rows
+impute_null_with_average <- function(x) {
+  if (is.na(x)) {
+    previous_index <- which(!is.na(df_87m$value))[1]
+    next_index <- which(!is.na(df_87m$value))[2]
+    
+    if (!is.na(previous_index) && !is.na(next_index)) {
+      previous_value <- df_87m$value[previous_index]
+      next_value <- df_87m$value[next_index]
+      return((previous_value + next_value) / 2)
+    }
+  }
+  
+  return(x)
+}
+
+# apply the function to impute null values
+df_87m <- df_87m %>%
+  rowwise() %>%
+  mutate(value = impute_null_with_average(value))
+
+# show null counts
+sum(is.na(df_87m))
+```
+
+### Create time series objects and visualize
+```{r}
 # Create time series object
 df_1m_ts <- ts(df_1m$value)
 df_9m_ts <- ts(df_9m$value)
@@ -46,19 +280,18 @@ ylab='Water Temperature (Degrees Celsius)') +
   autolayer(df_74m_ts, series='74m depth') +
   autolayer(df_87m_ts, series='87m depth')
 
-# statistics
-summary(df_1m$value)
-summary(df_9m$value)
-summary(df_20m$value)
-summary(df_30m$value)
-summary(df_45m$value)
-summary(df_60m$value)
-summary(df_74m$value)
-summary(df_87m$value)
-```
+## visualize depths of interest ##
+# 1m
+autoplot(df_1m_ts, main='RTOMS Readings at 1m', ylab='Water Temperature (Degrees Celsius)')
+# 20m
+autoplot(df_20m_ts, main='RTOMS Readings at 20m', ylab='Water Temperature (Degrees Celsius)')
+# 45m
+autoplot(df_45m_ts, main='RTOMS Readings at 45m', ylab='Water Temperature (Degrees Celsius)')
+# 60m
+autoplot(df_60m_ts, main='RTOMS Readings at 60m', ylab='Water Temperature (Degrees Celsius)')
+# 87m
+autoplot(df_87m_ts, main='RTOMS Readings at 87m', ylab='Water Temperature (Degrees Celsius)')
 
-Consider measurements at 20m, 45m, 60m, or 87m for analysis since they have the fewest nulls. 
-```{r}
 # see distribution of water temperatures
 par(mfrow=c(2,4))
 hist(df_1m$value, main='1m', xlab= 'Water Temperature (Degrees Celsius)')
@@ -71,12 +304,7 @@ hist(df_74m$value, main='74m', xlab= 'Water Temperature (Degrees Celsius)')
 hist(df_87m$value, main='87m', xlab= 'Water Temperature (Degrees Celsius)')
 ```
 
-
-**Null imputation** 
-Replace with mean value
-
-
-Differencing
+### Differencing
 ```{r}
 df_9m_diff <- diff(df_9m_ts, lag=6)
 
@@ -116,7 +344,7 @@ legend("topleft", legend = c("Original Time Series", "Training Set", "Forecast")
 
 ```
 
-##
+
 
 
 
