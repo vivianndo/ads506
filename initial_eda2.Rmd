@@ -281,8 +281,8 @@ ylab='Water Temperature (Degrees Celsius)') +
   autolayer(df_87m_ts, series='87m depth')
 
 ## visualize depths of interest ##
-# 1m
-autoplot(df_1m_ts, main='RTOMS Readings at 1m', ylab='Water Temperature (Degrees Celsius)')
+# 9m
+autoplot(df_9m_ts, main='RTOMS Readings at 9m', ylab='Water Temperature (Degrees Celsius)')
 # 20m
 autoplot(df_20m_ts, main='RTOMS Readings at 20m', ylab='Water Temperature (Degrees Celsius)')
 # 45m
@@ -302,6 +302,44 @@ hist(df_45m$value, main='45m', xlab= 'Water Temperature (Degrees Celsius)')
 hist(df_60m$value, main='60m', xlab= 'Water Temperature (Degrees Celsius)')
 hist(df_74m$value, main='74m', xlab= 'Water Temperature (Degrees Celsius)')
 hist(df_87m$value, main='87m', xlab= 'Water Temperature (Degrees Celsius)')
+```
+
+### Daily averages
+```{r}
+## 9m ##
+daily_avg_9m <- df_9m %>%
+  group_by(date=as.Date(datetime_pst)) %>%
+  summarize(avg_value = mean(value, na.rm=TRUE))
+daily_avg_9m_ts <- ts(daily_avg_9m$avg_value, frequency=365, start=c(2022,1,1))
+autoplot(daily_avg_9m_ts, main='Daily Averages-9m', ylab='Water Temperature(Degrees Celsius)')
+
+## 20m ##
+daily_avg_20m <- df_20m %>%
+  group_by(date=as.Date(datetime_pst)) %>%
+  summarize(avg_value = mean(value, na.rm=TRUE))
+daily_avg_20m_ts <- ts(daily_avg_20m$avg_value, frequency=365, start=c(2022,1,1))
+autoplot(daily_avg_20m_ts, main='Daily Averages-20m', ylab='Water Temperature(Degrees Celsius)')
+
+## 45m ##
+daily_avg_45m <- df_45m %>%
+  group_by(date=as.Date(datetime_pst)) %>%
+  summarize(avg_value = mean(value, na.rm=TRUE))
+daily_avg_45m_ts <- ts(daily_avg_45m$avg_value, frequency=365, start=c(2022,1,1))
+autoplot(daily_avg_45m_ts, main='Daily Averages-45m', ylab='Water Temperature(Degrees Celsius)')
+
+## 60m ##
+daily_avg_60m <- df_60m %>%
+  group_by(date=as.Date(datetime_pst)) %>%
+  summarize(avg_value = mean(value, na.rm=TRUE))
+daily_avg_60m_ts <- ts(daily_avg_60m$avg_value, frequency=365, start=c(2022,1,1))
+autoplot(daily_avg_60m_ts, main='Daily Averages-60m', ylab='Water Temperature(Degrees Celsius)')
+
+## 87m ##
+daily_avg_87m <- df_87m %>%
+  group_by(date=as.Date(datetime_pst)) %>%
+  summarize(avg_value = mean(value, na.rm=TRUE))
+daily_avg_87m_ts <- ts(daily_avg_9m$avg_value, frequency=365, start=c(2022,1,1))
+autoplot(daily_avg_87m_ts, main='Daily Averages-87m', ylab='Water Temperature(Degrees Celsius)')
 ```
 
 ### Differencing
