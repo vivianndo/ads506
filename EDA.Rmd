@@ -344,12 +344,19 @@ autoplot(daily_avg_87m_ts, main='Daily Averages-87m', ylab='Water Temperature(De
 
 ### Differencing
 ```{r}
-df_9m_diff <- diff(df_9m_ts, lag=6)
-
+df_9m_diff <- diff(df_9m_ts, frequency=365,start=c(2022,1,1))
+summary(df_9m_diff)
 # Plotting the results
 autoplot(df_9m_diff) +
   labs(title = "Differenced Time Series (depth_m = 9)", y = "Difference") +
   theme_classic()
+```
+```{r}
+#ACF and PACF plots
+acf(df_9m_diff, main = "ACF of Differenced Time Series")
+pacf(df_9m_diff, main = "PACF of Differenced Time Series")
+# Add titles and labels
+title(main = "Differencing Plot", xlab = "Time", ylab = "Differences")
 ```
 ```{r}
 # Fit ARIMA model with differencing
@@ -357,35 +364,57 @@ df_9m_diff_model <- Arima(df_9m_ts, order = c(1, 1, 1), seasonal = list(order = 
 df_9m_ARIMA <- residuals(df_9m_diff_model)
 plot(df_9m_ARIMA , main = "Differenced Time Series", ylab = "Differenced Values")
 ```
-
-
 ```{r}
-# Fit Logistic Regression model
-df_9m_train <- window(df_9m_ts, end = length(df_9m_ts) - 24)
+#ACF and PACF plots
+acf(df_9m_ARIMA, main = "ACF of ARIMA model")
+pacf(df_9m_ARIMA, main = "PACF of ARIMA model")
+# Add titles and labels
+title(main = "Differencing Plot", xlab = "Time", ylab = "Differences")
+```
+```{r}
+# Fit EST model
+df_9m_train <- window(df_9m_ts, end = length(df_9m_ts) - 25)
 df_9m_test <- window(df_9m_ts, start = length(df_9m_ts) - 23)
-
 # Fit ETS model to the differenced training set
 df_9m_model <- ets(df_9m_train)
-
 # Generate forecasts for the differenced test set
 df_9m_pred <- forecast(df_9m_model, h = 24)
-
 summary(df_9m_model)
 ```
 ```{r}
-plot(df_9m_ts, col = "blue", main = "Time Series Forecasting with Logistic Regression Model")
+plot(df_9m_ts, col = "blue", main = "Time Series Forecasting with EST Model")
 lines(df_9m_train, col = "red", lty = 2, lwd = 2)
 lines(df_9m_pred$mean, col = "green", lty = 2, lwd = 2)
-
 # Add legend
 legend("topleft", legend = c("Original Time Series", "Training Set", "Forecast"), col = c("blue", "red", "green"), lty = c(1, 2, 2))
-
 ```
-
-
-
-
-
-
+```{r}
+# fit Linear Regression model
+df_9m_TS <- ts(df_9m$value, start = c(2022, 1), frequency = 12)
+# Train and test split
+test_length <- 12
+train_length <- length(df_9m_TS) - test_length
+df_9m_train <- window(df_9m_TS)
+df_9m_test <- window(df_9m_TS)
+# Fit linear regression model to training set
+train_length.lm <- tslm(df_9m_train ~ trend + season)
+# Generate forecasts for the test set
+train_length.lm.pred <- forecast(train_length.lm, h = test_length, level = 0)
+# Fit linear regression model to the entire time series
+df_9m.lm.tns <- tslm(df_9m_TS ~ trend + season)
+# Generate forecasts for the entire time series
+df_9m.lm.tns.pred <- forecast(df_9m.lm.tns, h = length(df_9m_test), level = 0) 
+# Plotting
+plot_data <- data.frame(
+  Year = time(df_9m_TS),
+  Actual = as.numeric(df_9m_TS),
+  Predicted = as.numeric(df_9m.lm.tns.pred$mean)
+)
+ggplot(plot_data, aes(x = Year)) +
+  geom_line(aes(y = Actual), color = 'blue', size = 1, linetype = 'solid') +
+  geom_line(aes(y = Predicted), color = 'red', size = 1, linetype = 'dashed') +
+  labs(x = 'Time', y = 'Plot of Linear Regression model') +
+  theme_classic()
+```
 
 
