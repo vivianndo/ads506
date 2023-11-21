@@ -344,6 +344,11 @@ autoplot(daily_avg_87m_ts, main='Daily Averages-87m', ylab='Water Temperature(De
 
 ### Differencing
 ```{r}
+acf(diff(daily_avg_9m_ts))
+pacf(diff(daily_avg_9m_ts))
+```
+
+```{r}
 df_9m_diff <- diff(df_9m_ts, frequency=365,start=c(2022,1,1))
 summary(df_9m_diff)
 # Plotting the results
@@ -358,6 +363,7 @@ pacf(df_9m_diff, main = "PACF of Differenced Time Series")
 # Add titles and labels
 title(main = "Differencing Plot", xlab = "Time", ylab = "Differences")
 ```
+
 ```{r}
 # Fit ARIMA model with differencing
 df_9m_diff_model <- Arima(df_9m_ts, order = c(1, 1, 1), seasonal = list(order = c(1, 1, 1)))
