@@ -371,8 +371,28 @@ pacf(df_45m_ARIMA, main = "PACF of ARIMA model")
 ```
 
 ```{r}
+# fit a EST model
+ets_model <- ets(daily_avg_45m_ts)
+
+# Summary of the ETS model
+summary(ets_model)
+
+# Make forecasts with the ETS model (e.g., forecast for the next 24 periods)
+ets_forecast <- forecast(ets_model, h = 12)
+
+plot(ets_forecast, main = "ETS Model Forecast", ylab = "value", xlab = "time")
+
+# Add the actual time series for comparison
+lines(daily_avg_45m_ts, col = "blue", lty = 1)
+
+# Add a legend
+legend("topright", legend = c("Actual", "Forecast"), col = c("blue", "red"), lty = 1:1)
+```
+
+
+
 # fit Linear Regression model
-model_lm <- lm(daily_avg_9m_ts ~ time(daily_avg_9m_ts))
+model_lm <- lm(daily_avg_45m_ts ~ time(daily_avg_45m_ts))
 
 # Print summary of the linear regression model
 summary(model_lm)
@@ -380,8 +400,8 @@ predictions <- predict(model_lm)
 
 # Create a data frame for plotting
 plot_data <- data.frame(
-  Time = time(daily_avg_9m_ts),
-  Actual = as.numeric(daily_avg_9m_ts),
+  Time = time(daily_avg_45m_ts),
+  Actual = as.numeric(daily_avg_45m_ts),
   Predicted = as.numeric(predictions)
 )
 
