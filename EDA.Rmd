@@ -371,7 +371,7 @@ pacf(df_45m_ARIMA, main = "PACF of ARIMA model")
 ```
 
 ```{r}
-# fit a EST model
+# fit a ets model
 ets_model <- ets(daily_avg_45m_ts)
 
 # Summary of the ETS model
