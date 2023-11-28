@@ -266,6 +266,18 @@ autoplot(naive_predict$fitted, series='Naive Forecasts') + autolayer(train_ts, a
 # naive forecasts
 autoplot(naive_predict)
 ```
+## Create auto-ARIMA model
+```{r}
+auto_arima <- auto.arima(train_ts)
+summary(auto_arima)
+auto_arima_pred <- forecast(auto_arima, valid_ts)
+accuracy(auto_arima_pred, valid_ts)
+```
+
+# Compare naive forecasts and auto-Arima models
+```{r}
+autoplot(auto_arima$fitted, series='Auto-ARIMA', alpha=0.4) + autolayer(train_ts, series='Training Data', color='black') + autolayer(naive_model$fitted, series='Naive Model', alpha=0.4)
+```
 
 ```{r}
 nn_model <- nnetar(train_ts, repeats = 20, p = 7, P = 0, size = 5)
