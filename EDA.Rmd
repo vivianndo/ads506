@@ -24,6 +24,9 @@ df <- read_csv('PLOO_water_temperature_2022_datasd.csv', show_col_types = FALSE)
 
 # convert the start date string into a POSIXct object
 df$datetime_pst <- as.POSIXct(df$datetime_pst, format='%Y-%m-%d %H:%M:%S')
+
+summary(df)
+dim(df)
 ```
 
 ### Data splicing
@@ -57,7 +60,7 @@ Replace nulls with average value of previous and next temperature readings. If b
 ```{r}
 ## 1 meter ##
 # create function to use next available non-NA values for previous and next rows
-impute_null_with_average <- function(x) {
+impute_null_with_average1 <- function(x) {
   if (is.na(x)) {
     previous_index <- which(!is.na(df_1m$value))[1]
     next_index <- which(!is.na(df_1m$value))[2]
@@ -75,14 +78,14 @@ impute_null_with_average <- function(x) {
 # apply the function to impute null values
 df_1m <- df_1m %>%
   rowwise() %>%
-  mutate(value = impute_null_with_average(value))
+  mutate(value = impute_null_with_average1(value))
 
 # show null counts
 sum(is.na(df_1m))
 
 ## 9 meter ##
 # create function to use next available non-NA values for previous and next rows
-impute_null_with_average <- function(x) {
+impute_null_with_average9 <- function(x) {
   if (is.na(x)) {
     previous_index <- which(!is.na(df_9m$value))[1]
     next_index <- which(!is.na(df_9m$value))[2]
@@ -100,7 +103,7 @@ impute_null_with_average <- function(x) {
 # apply the function to impute null values
 df_9m <- df_9m %>%
   rowwise() %>%
-  mutate(value = impute_null_with_average(value))
+  mutate(value = impute_null_with_average9(value))
 
 # show null counts
 sum(is.na(df_9m))
@@ -108,7 +111,7 @@ sum(is.na(df_9m))
 
 ## 20m ##
 # create function to use next available non-NA values for previous and next rows
-impute_null_with_average <- function(x) {
+impute_null_with_average20 <- function(x) {
   if (is.na(x)) {
     previous_index <- which(!is.na(df_20m$value))[1]
     next_index <- which(!is.na(df_20m$value))[2]
@@ -126,14 +129,14 @@ impute_null_with_average <- function(x) {
 # apply the function to impute null values
 df_20m <- df_20m %>%
   rowwise() %>%
-  mutate(value = impute_null_with_average(value))
+  mutate(value = impute_null_with_average20(value))
 
 # show null counts
 sum(is.na(df_20m))
 
 ## 30m ##
 # create function to use next available non-NA values for previous and next rows
-impute_null_with_average <- function(x) {
+impute_null_with_average30 <- function(x) {
   if (is.na(x)) {
     previous_index <- which(!is.na(df_30m$value))[1]
     next_index <- which(!is.na(df_30m$value))[2]
@@ -151,14 +154,14 @@ impute_null_with_average <- function(x) {
 # apply the function to impute null values
 df_30m <- df_30m %>%
   rowwise() %>%
-  mutate(value = impute_null_with_average(value))
+  mutate(value = impute_null_with_average30(value))
 
 # show null counts
 sum(is.na(df_30m))
 
 ## 45m ##
 # create function to use next available non-NA values for previous and next rows
-impute_null_with_average <- function(x) {
+impute_null_with_average45 <- function(x) {
   if (is.na(x)) {
     previous_index <- which(!is.na(df_45m$value))[1]
     next_index <- which(!is.na(df_45m$value))[2]
@@ -176,14 +179,14 @@ impute_null_with_average <- function(x) {
 # apply the function to impute null values
 df_45m <- df_45m %>%
   rowwise() %>%
-  mutate(value = impute_null_with_average(value))
+  mutate(value = impute_null_with_average45(value))
 
 # show null counts
 sum(is.na(df_45m))
 
 ## 60m ##
 # create function to use next available non-NA values for previous and next rows
-impute_null_with_average <- function(x) {
+impute_null_with_average60 <- function(x) {
   if (is.na(x)) {
     previous_index <- which(!is.na(df_60m$value))[1]
     next_index <- which(!is.na(df_60m$value))[2]
@@ -201,14 +204,14 @@ impute_null_with_average <- function(x) {
 # apply the function to impute null values
 df_60m <- df_60m %>%
   rowwise() %>%
-  mutate(value = impute_null_with_average(value))
+  mutate(value = impute_null_with_average60(value))
 
 # show null counts
 sum(is.na(df_60m))
 
 ## 74m ##
 # create function to use next available non-NA values for previous and next rows
-impute_null_with_average <- function(x) {
+impute_null_with_average74 <- function(x) {
   if (is.na(x)) {
     previous_index <- which(!is.na(df_74m$value))[1]
     next_index <- which(!is.na(df_74m$value))[2]
@@ -226,14 +229,14 @@ impute_null_with_average <- function(x) {
 # apply the function to impute null values
 df_74m <- df_74m %>%
   rowwise() %>%
-  mutate(value = impute_null_with_average(value))
+  mutate(value = impute_null_with_average74(value))
 
 # show null counts
 sum(is.na(df_74m))
 
 ## 87m ##
 # create function to use next available non-NA values for previous and next rows
-impute_null_with_average <- function(x) {
+impute_null_with_average87 <- function(x) {
   if (is.na(x)) {
     previous_index <- which(!is.na(df_87m$value))[1]
     next_index <- which(!is.na(df_87m$value))[2]
@@ -251,7 +254,7 @@ impute_null_with_average <- function(x) {
 # apply the function to impute null values
 df_87m <- df_87m %>%
   rowwise() %>%
-  mutate(value = impute_null_with_average(value))
+  mutate(value = impute_null_with_average87(value))
 
 # show null counts
 sum(is.na(df_87m))
