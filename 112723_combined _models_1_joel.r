@@ -250,28 +250,31 @@ lines(daily_avg_45m_ts, col = "blue", lty = 1)
 # Add a legend
 legend("topright", legend = c("Actual", "Forecast"), col = c("blue", "red"), lty = 1:1)
 
-lin_model <- lm(daily_avg_45m_ts ~ time(daily_avg_45m_ts))
-summary(lin_model)
+# Set the number of validation points
+nValid <- 36
 
-predictions <- predict(lin_model)
+# Calculate the number of training points
+nTrain <- length(daily_avg_45m_ts) - nValid
 
-predictions <- predict(lin_model)
+# Create training and validation sets
+train_ts <- window(daily_avg_45m_ts, end = c(2022, nTrain))
+valid_ts <- window(daily_avg_45m_ts, start = c(2022, nTrain + 1), end = c(2022, nTrain + nValid))
 
-# Create a data frame for plotting
-plot_data <- data.frame(
-  Time = time(daily_avg_45m_ts),
-  Actual = as.numeric(daily_avg_45m_ts),
-  Predicted = as.numeric(predictions)
-)
+# Fit linear regression model with quadratic trend
+model_lm <- tslm(train_ts ~ trend + I(trend^2))
+summary(model_lm)
+# Generate forecasts for the validation set
+model_lm_pred <- forecast(model_lm, h = nValid, level = 0)
 
 # Plotting
-library(ggplot2)
+plot(model_lm_pred, ylim = c(min(daily_avg_45m_ts), max(daily_avg_45m_ts)), ylab = "Daily Average", xlab = "Time", bty = "l",
+     xaxt = "n", main = "", flty = 2)
+axis(1, at = time(valid_ts), labels = format(time(valid_ts)))
 
-ggplot(plot_data, aes(x = Time)) +
-  geom_line(aes(y = Actual), color = 'blue', size = 1, linetype = 'solid') +
-  geom_line(aes(y = Predicted), color = 'red', size = 1, linetype = 'dashed') +
-  labs(x = 'Time', y = 'Linear Regression Model') +
-  theme_minimal()
+# Add fitted values and actual values
+lines(model_lm$fitted, lwd = 2)
+lines(valid_ts)
+
 
 
 
