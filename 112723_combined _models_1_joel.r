@@ -247,6 +247,26 @@ length(valid_ts)
 chosen_ts <- daily_avg_45m_ts
 autoplot(chosen_ts, main=paste0('Daily Average at ', 45 ,'m'), ylab='Water Temperature (Degrees Celsius)')
 ```
+## Create naive forecast
+```{r}
+naive_model <- naive(train_ts)
+naive_predict <- forecast(naive_model)
+accuracy(naive_predict,valid_ts)
+```
+
+```{r}
+# show residuals
+autoplot(naive_model$residuals)
+```
+```{r}
+# show model fit 
+autoplot(naive_predict$fitted, series='Naive Forecasts') + autolayer(train_ts, alpha=0.4, series='Training Data')
+```
+```{r}
+# naive forecasts
+autoplot(naive_predict)
+```
+
 ```{r}
 nn_model <- nnetar(train_ts, repeats = 20, p = 7, P = 0, size = 5)
 summary(nn_model)
@@ -277,6 +297,7 @@ model_lm <- tslm(train_ts ~ trend + I(trend^2))
 summary(model_lm)
 # Generate forecasts for the validation set
 model_lm_pred <- forecast(model_lm, h = nValid, level = 0)
+accuracy(model_lm_pred, valid_ts)
 
 # Plotting
 plot(model_lm_pred, ylim = c(min(daily_avg_45m_ts), max(daily_avg_45m_ts)), ylab = "Daily Average", xlab = "Time", bty = "l",
