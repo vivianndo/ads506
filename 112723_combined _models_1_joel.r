@@ -274,6 +274,8 @@ auto_arima_pred <- forecast(auto_arima, valid_ts)
 accuracy(auto_arima_pred, valid_ts)
 ```
 
+ARIMA(4,1,2) : The automated ARIMA model contains 4 ar terms, contains a difference in the first degree, and 2 ma terms. 
+
 # Compare naive forecasts and auto-Arima models
 ```{r}
 autoplot(auto_arima$fitted, series='Auto-ARIMA', alpha=0.4) + autolayer(train_ts, series='Training Data', color='black') + autolayer(naive_model$fitted, series='Naive Model', alpha=0.4)
@@ -321,6 +323,29 @@ lines(model_lm$fitted, lwd = 2)
 lines(valid_ts)
 ```
 
+## ARIMA model
+Look at ACF and PACF plots to determine ARIMA components
+```{r}
+acf(train_ts)
+```
+
+All ACF values are significant. Take the first difference. 
+```{r}
+acf(diff(train_ts))
+```
+
+Taking the first difference removed most of the auto-correlation in the series. 
+```{r}
+pacf(train_ts)
+pacf(diff(train_ts))
+```
+```{r}
+# arima model
+arima_model <- arima(train_ts, order=c(4,1,1))
+summary(arima_model)
+arima_pred <- forecast(arima_model)
+accuracy(arima_pred, valid_ts)
+```
 
 
 list_of_models <- c(nn_model, arima_model, ets_model, lin_model)
