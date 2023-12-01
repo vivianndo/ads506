@@ -246,6 +246,9 @@ nTrain <- length(daily_avg_45m_ts) - nValid
 # Create training and validation sets
 train_ts <- window(daily_avg_45m_ts, end = c(2022, nTrain))
 valid_ts <- window(daily_avg_45m_ts, start = c(2022, nTrain + 1), end = c(2022, nTrain + nValid))
+train_ts <- window(daily_avg_45m_ts, start = c(2022,1), end= c(2022, 319))
+valid_ts <- window(daily_avg_45m_ts, start= c(2022, 320))
+#daily_avg_45m_ts
 length(train_ts)
 length(valid_ts)
 ```
@@ -256,7 +259,7 @@ autoplot(chosen_ts, main=paste0('Daily Average at ', 45 ,'m'), ylab='Water Tempe
 ```
 ## Create naive forecast
 ```{r}
-naive_model <- naive(train_ts)
+naive_model <- naive(train_ts, h=30)
 naive_predict <- forecast(naive_model)
 accuracy(naive_predict,valid_ts)
 ```
@@ -267,12 +270,13 @@ autoplot(naive_model$residuals)
 ```
 ```{r}
 # show model fit 
-autoplot(naive_predict$fitted, series='Naive Forecasts') + autolayer(train_ts, alpha=0.4, series='Training Data')
+autoplot(naive_predict) + ylab('Degrees Celsius') + coord_cartesian(xlim=c(2022.88,2022.95)) + autolayer(valid_ts, series='Actual', size=3) + autolayer(naive_predict$mean, color='black', series = 'Forecasted') + labs(title='Forecasted vs Actual')
+
 ```
 ```{r}
-# naive forecasts
-autoplot(naive_predict)
+autoplot(naive_predict, series='Forecasted', ylab='Degrees Celsius') + autolayer(valid_ts, color='black', series= 'Actual') 
 ```
+
 ## Create auto-ARIMA model
 ```{r}
 auto_arima <- auto.arima(train_ts)
