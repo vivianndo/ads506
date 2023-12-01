@@ -197,6 +197,9 @@ df_60m_diff <- diff(df_60m_ts, frequency=365,start=c(2022,1,1))
 df_74m_diff <- diff(df_74m_ts, frequency=365,start=c(2022,1,1))
 df_87m_diff <- diff(df_87m_ts, frequency=365,start=c(2022,1,1))
 ```
+```{r}
+autoplot(daily_avg_45m_ts)
+```
 
 ```{r}
 #Create empty data frame
@@ -227,6 +230,10 @@ par(mfrow=c(2, 4))
 for (z in diff_dfs) {    
     pacf(z, main = "PACF of Differenced Time Series")
 }
+```
+## Export daily average measurements at 45m for visualizations in Tableau
+```{r}
+write_csv(daily_avg_45m, "ploo_daily_avg_45m.csv")
 ```
 ## Create train and test sets
 ```{r}
