@@ -57,7 +57,7 @@ for (x in depths_df) {
 colnames(output) = c("Min.","1st Qu.","Median","Mean","3rd Qu.","Max.", "NA's")
 
 # add a cxolumn to label depth
-depths <- list(1, 9, 20, 30, 45, 60, 74, 87)
+depths <- c(1, 9, 20, 30, 45, 60, 74, 87)
 output$Depth <- depths
 output <- output[c("Depth","Min.","1st Qu.","Median","Mean","3rd Qu.","Max.", "NA's")]
 output
