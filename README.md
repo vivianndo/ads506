@@ -3,7 +3,7 @@
 ## Project Status: [Completed]
 
 # Installation
-## Github Link: https://github.com/vivianndo/ads506
+## Github Repository: https://github.com/vivianndo/ads506
 
 # Project Intro/Objective
 ## Coastal moorings/mooring systems consist of an anchored buoy configured with instruments suspended in the water column collecting in real-time physical, chemical, and biological observations at one or more depths. Observations include both physical oceanographic (such as salinity, temperature, and currents) and meteorological measurements (such as wind speed and direction, air temperature, atmospheric pressure, etc) (Bailey et al., 2019). Moorings provide a continuous data stream that informs a number of industries including shipping, fishing, energy generation, scientific research, military, coastal and emergency managers, among many others. 
